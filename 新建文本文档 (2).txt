@@ -1,0 +1,257 @@
+1
+data a(drop=i);
+n=2;
+output;
+do n=3 to 10000 by 2;
+do i=2 to n-1;
+if mod(n,i)=0 then leave;
+if i=n-1 then output;
+end;
+end;
+run;
+proc print; 
+run;
+
+%macro m(x=);
+data a(drop=i);
+n=2;
+output;
+do n=3 to &x. by 2;
+do i=2 to n-1;
+if mod(n,i)=0 then leave;
+if i=n-1 then output;
+end;
+end;
+run;
+proc print; 
+run;
+%mend;
+%m(x=100);
+
+
+2
+
+data b(drop=n);
+n=280;
+i=2;
+do i=2 to n;
+do until (mod(n,i)^=0);
+if mod(n,i)=0 then do;
+output;
+n=n/i;
+end;
+end;
+end;
+run;
+proc print; 
+run;
+
+%macro m(x=);
+data b(drop=n);
+n=&x.;
+i=2;
+do i=2 to n;
+do until (mod(n,i)^=0);
+if mod(n,i)=0 then do;
+output;
+n=n/i;
+end;
+end;
+end;
+run;
+proc print; 
+run;
+%mend;
+%m(x=140);
+
+
+3
+
+data tfenweishu;
+do p=0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2;
+do i=1 to 100;
+fenweishu=TINV((1-0.5*p),i);
+output;
+FILE 'C:\a\hello.txt' print;
+put p 1-5 .3 i 6-20 fenweishu 21-40 .3;
+end;
+end;
+run;
+
+
+4
+data tianshu;
+tian=intck('day','15mar1995'd,'01jan2000'd);
+put tian;
+run;
+
+5
+data hell;
+input name $ 1-3 sex $ area $ 7-8 date $ 10-18 money;
+cards;
+zw  m hd 1996-3-20 1099
+wgm m hd 1996-5-19 39
+tzm f hb 1996-1-5  986
+lnx m db 1997-10-1 3581
+lsj f hb 1997-4-4  659
+gz  f db 1996-11-5 358
+zx  f db 1998-9-6  2010
+;
+run;
+
+proc sql;
+select name;
+from hell;
+where money>1000 and sex=‘m’;
+run;
+
+data whatthehell;
+set hell(keep=name sex area);
+run;
+proc print;
+run;
+data whatthehell2;
+set hell(keep=name date money);
+run;
+proc print;
+run;
+
+data merges;
+merge whatthehell whatthehell2;
+run;
+
+6
+Title '老师情况';
+data teacher;
+input tname teachername $;
+cards;
+1 张民
+2 李秀丽
+3 曾维薇
+;
+run;
+
+Title '一组情况';
+data g1;
+input sname SID $;
+cards;
+101 刘娜
+102 张秀敏
+103 于长江
+;
+run;
+
+Title '二组情况';
+data g2;
+input sname SID $;
+cards;
+201 方开祥
+202 耿火清
+203 李芳
+;
+run;
+
+Title '三组情况';
+data g3;
+input sname SID $;
+cards;
+301 何明
+302 孙成秀
+303 张克成
+;
+run;
+
+data new;
+set teachercondition2(in=a) teachercondition3(in=b) teachercondition4(in=c);
+if a=1 then teacher='张民';
+if a=2 then teacher='李秀丽';
+if a=3 then teacher='曾维薇';
+run;
+
+
+7
+data A;
+input subject $ 1-4 tname $ 6-11 y $13-30;
+cards;
+数学 张民   刘娜,张秀敏
+美术 李秀丽 方开祥,耿火清,李芳
+英语 曾维薇 何明
+;
+run;
+
+data C;
+set A;
+y_1=scan(y,1,",");
+y_2=scan(y,2,",");
+y_3=scan(y,3,",");
+drop y;
+run;
+proc transpose data=C out=B(rename=(col1=y) drop=_NAME_);
+by x;
+var y_:;
+run;
+data B;
+set B;
+if y = . then delete;
+run;
+
+8
+data D1;
+array X(100);
+do i=1 to 50;
+do j=1 to 100;
+X(j)=NORMAL(0);
+end;
+R=i;
+output;
+end;
+drop i j;
+run;
+proc print;
+run;
+
+%macro aa;
+%do P=1 %to 20;
+data D&P.;
+array X(100);
+do i=1 to 50;
+do j=1 to 100;
+X(j)=NORMAL(0);
+end;
+R=i;
+output;
+end;
+drop i j;
+run;
+proc print;
+run;
+%end;
+%mend aa;
+%aa;
+
+data 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
