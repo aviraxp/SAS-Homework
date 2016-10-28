@@ -354,7 +354,44 @@ run;
 proc print;run;
 
 10
-
+data a1;
+infile 'c:\a\222.txt';
+sum = 0;
+do while (1);
+input x $ 1-6 y $;
+if (x = '姓名：') then do; z = 1; sum = sum +1;end;
+if (x = '电子邮') then do; z = 2; y = SUBSTR(y,5,length(y)-4); end;
+if (x = '电话：') then z = 3;
+if (x = '工作单') then do; z = 4; y = SUBSTR(y,5,length(y)-4); end;
+drop x;
+output;
+end;
+run;
+data b1;
+set a1;
+if z = 1;
+rename y = name;
+run;
+data c1;
+set a1;
+if z = 2;
+rename y = email;
+run;
+data d1;
+set a1;
+if z = 3;
+rename y =dianhua;
+run;
+data e1;
+set a1;
+if z = 4;
+rename y = danwei;
+run;
+data findal;
+merge b1 c1 d1 e1;
+by sum;
+drop sum z;
+run;
 
 
 
