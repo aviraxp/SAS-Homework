@@ -1,0 +1,372 @@
+王晗 1300015515
+
+1
+
+data a(drop=i);
+n=2;
+output;
+do n=3 to 10000 by 2;
+do i=2 to n-1;
+if mod(n,i)=0 then leave;
+if i=n-1 then output;
+end;
+end;
+run;
+proc print; 
+run;
+
+%macro m(x=);
+data a(drop=i);
+n=2;
+output;
+do n=3 to &x. by 2;
+do i=2 to n-1;
+if mod(n,i)=0 then leave;
+if i=n-1 then output;
+end;
+end;
+run;
+proc print; 
+run;
+%mend;
+%m(x=100);
+
+
+2
+
+data b(drop=n);
+n=280;
+i=2;
+do i=2 to n;
+do until (mod(n,i)^=0);
+if mod(n,i)=0 then do;
+output;
+n=n/i;
+end;
+end;
+end;
+run;
+proc print; 
+run;
+
+%macro m(x=);
+data b(drop=n);
+n=&x.;
+i=2;
+do i=2 to n;
+do until (mod(n,i)^=0);
+if mod(n,i)=0 then do;
+output;
+n=n/i;
+end;
+end;
+end;
+run;
+proc print; 
+run;
+%mend;
+%m(x=140);
+
+
+3
+
+data D1;
+ziyoudu=1;
+array X(8);
+do j=1 to 100;
+ziyoudu=j;
+do p=1 to 8;
+if p=1 then c=0.001;
+if p=2 then c=0.002;
+if p=3 then c=0.005;
+if p=4 then c=0.01;
+if p=5 then c=0.02;
+if p=6 then c=0.05;
+if p=7 then c=0.1;
+if p=8 then c=0.2;
+X(p)=TINV((1-0.5*c),j);
+end;
+output;
+end;
+drop p j c;
+rename X1=P0001 X2=P0002 x3=P0005 X4=P001 X5=P002 X6=P005 X7=P01 X8=P02;
+run;
+proc print;
+run;
+data D2;
+set D1;
+FILE 'C:\a\12345vgf8dsfdfdd8888857.txt' print;
+Title;
+if _n_=1 then put "ziyoudu    0.001   0.002   0.005    0.01    0.02    0.05     0.1       0.2";
+put ziyoudu p0001 9-16 .3 p0002 18-24 .3 p0005 26-32 .3 p001 34-40 .3 p002 42-48 .3 p005 50-56 .3 p01 58-64 .3 p02 66-74 .3;
+run;
+
+
+4
+data tianshu;
+tian=intck('day','15mar1995'd,'01jan2000'd);
+put tian;
+run;
+
+5
+data hell;
+input name $ 1-3 sex $ area $ 7-8 date $ 10-18 money;
+cards;
+zw  m hd 1996-3-20 1099
+wgm m hd 1996-5-19 39
+tzm f hb 1996-1-5  986
+lnx m db 1997-10-1 3581
+lsj f hb 1997-4-4  659
+gz  f db 1996-11-5 358
+zx  f db 1998-9-6  2010
+;
+run;
+
+proc sql;
+select name;
+from hell;
+where money>1000 and sex=‘m’;
+run;
+
+data whatthehell;
+set hell(keep=name sex area);
+run;
+proc print;
+run;
+data whatthehell2;
+set hell(keep=name date money);
+run;
+proc print;
+run;
+
+data merges;
+merge whatthehell whatthehell2;
+run;
+
+6
+Title '老师情况';
+data teacher;
+input tid teachername $;
+cards;
+1 张民
+2 李秀丽
+3 曾维薇
+;
+run;
+
+Title '一组情况';
+data g1;
+input SID sname $;
+cards;
+101 刘娜
+102 张秀敏
+103 于长江
+;
+run;
+
+Title '二组情况';
+data g2;
+input SID sname $;
+cards;
+201 方开祥
+202 耿火清
+203 李芳
+;
+run;
+
+Title '三组情况';
+data g3;
+input SID sname $;
+cards;
+301 何明
+302 孙成秀
+303 张克成
+;
+run;
+
+
+data g1new(keep=SID sname gid);
+set g1;
+gid=1;
+run;
+
+data g2new(keep=SID sname gid);
+set g2;
+gid=2;
+run;
+
+data g3new(keep=SID sname gid);
+set g3;
+gid=3;
+run;
+
+data mergetable;
+set g1new g2new g3new;
+run;
+
+proc sql;
+create table new as
+select SID, sname, teachername
+from mergetable,teacher
+where gid=tid;
+quit;
+
+7
+data A;
+input subject $ 1-4 tname $ 6-11 y $13-30;
+cards;
+数学 张民   刘娜,张秀敏
+美术 李秀丽 方开祥,耿火清,李芳
+英语 曾维薇 何明
+;
+run;
+
+data E;
+set A;
+y_1 = scan(y,1,",");
+y_2 = scan(y,2,",");
+y_3 = scan(y,3,",");
+drop y;
+run;
+data C;
+set E;
+if _N_=1 then i=1;
+if _N_=2 then i=2;
+if _N_=3 then i=3;
+run;
+proc transpose data=C out=need(rename=(col1=y) drop=_NAME_);
+by i;
+var y_:;
+copy subject tname;
+run;
+data B;
+set need;
+retain subject1;
+if subject^='' then subject1=subject;
+retain tname1;
+if tname^='' then tname1=tname;
+drop i subject tname;
+if y ='' then delete;
+run;
+
+8
+data D1;
+R=1;
+array X(100);
+do i=1 to 50;
+do j=1 to 100;
+X(j)=NORMAL(0);
+end;
+R=i;
+output;
+end;
+drop i j;
+run;
+proc print;
+run;
+
+
+%macro aa;
+%do P=1 %to 20;
+data D&P.;
+R=1;
+array X(100);
+do i=1 to 50;
+do j=1 to 100;
+X(j)=NORMAL(0);
+end;
+R=i;
+output;
+end;
+drop i j;
+run;
+proc print;
+run;
+%end;
+%mend aa;
+%aa;
+
+
+data dnew;
+set d1-d10;
+run;
+%macro hehe;
+data d;
+set dnew;
+%do p=1 %to 100;
+y&i.=sign(abs(x&i.)-1.96);
+z&i.=abs(sign(abs(x&i.)-1.96));
+%end;
+run;
+%mend hehe;
+%hehe;
+
+data hack;
+set d;
+max=MAX(of x1-x100);
+min=MIN(of x1-x100);
+std=STD(of x1-x100);
+mean=MEAN(of x1-x100);
+rat=(SUM(of z1-z100)-SUM(of y1-y100))/200;
+drop x1-x100 y1-y100 z1-z100;
+run;
+
+9
+
+proc import out=score2
+datafile="c:\a\scores.csv";
+run;
+
+proc import out=score3
+datafiile="c:\a\student.csv";
+run;
+
+proc import out=score4
+datafiile="c:\a\subayw.csv";
+run;
+
+proc import out=score5
+datafiile="c:\a\subsyw.csv";
+run;
+
+data heiheihei;
+infile ’c:\a\scores.csv’ DSD delimiter="," firstobs=2;
+input xuehao zongfen shuxue yuwen waiyu wuli huaxue shengwu lizong lishi zhengzhi dili wenzong;
+run;
+proc print;run;
+
+data heiheihei2;
+infile "c:\a\subsyw.csv" DSD delimiter="," firstobs=2;
+input xuehao Y1 Y2 Y3 Y4 Y5 Y6 Y7 Y8 Y9 Y10 Y11 Y12 Y13 Y14 Y15 Y16 Y17 Y18;
+run;
+proc print;run;
+
+data heiheihei3;
+infile "c:\a\subayw.csv" DSD delimiter="," firstobs=2;
+input xuhao datihao $ xiaotihao tixing $;
+run;
+proc print;run;
+
+data heiheihei4;
+infile "c:\a\student.csv" DSD delimiter="," firstobs=2;
+input xuhao wenlike $ gaozhong $;
+run;
+proc print;run;
+
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
