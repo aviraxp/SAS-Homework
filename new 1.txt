@@ -1,0 +1,214 @@
+1
+
+proc print data=samp.business noobs label;
+label company="公司" NATION="国家" INDUSTRY="部门" EMPLOYS="以千计雇员" SALES="以百万计销售" PROFITS="以百万计利润";
+id company;
+run;
+
+proc print data=samp.business;
+sum sales;
+run;
+proc sort data=samp.business;
+by company industry descending sales;
+proc print;
+var company sales profits;
+by nation industry;
+sum sales;
+run;
+
+proc tabulate data=samp.business;
+class national industry;
+var sales;
+table national all, (industry all)*sales*sum;
+label national="国家" INDUSTRY= "部门" SALES="以百万计销售";
+keylabel sum="总和";
+run;
+
+2
+
+proc transpose data=d1 out=e1;
+drop R;
+var x1-x100;
+run;
+
+proc transpose data=d1 out=f1;
+var x1-x100;
+by R;
+run;
+
+3
+
+proc univariate data=sasuser.gpa;
+var satm;
+run;
+
+proc corr data=sasuser.gpa;
+var hss hsm hse;
+run;
+
+proc gchart data=sasuser.gpa;
+vbar satm;
+run;
+
+proc gplot data=sasuser.gpa;
+symbol i=none v=star;
+plot satv*satm;
+run;
+
+4.
+
+proc univariate data=samp.fitness;
+var oxygen;
+run;
+
+proc means data=samp.fitness;
+var age weight runtime rstpulse runpulse maxpulse oxygen;
+by group;
+run;
+
+proc corr data=tmp7.fitness;
+var age weight runtime rstpulse runpulse maxpulse oxygen group;
+run;
+
+5.
+
+proc transpose data=d1 out=e1;
+drop R;
+var x1-x100;
+run;
+
+proc transpose data=d1 out=f1;
+var x1-x100;
+by R;
+run;
+
+proc gchart data=f1;
+vbar COL1 / group=R;
+run;
+
+6.
+
+data caiyicai;
+do x=0.001 to 10 by 0.001;
+a=PDF("F",x,1,30);
+j=PDF("F",x,2,30);
+k=PDF("F",x,3,30);
+l=PDF("F",x,4,30);
+m=PDF("F",x,5,30);
+n=PDF("F",x,10,30);
+output;
+end;
+run;
+proc gplot data=caiyicai;
+symbol1 i=join v=none line=1;
+symbol2 i=join v=none line=2;
+symbol3 i=join v=none line=3;
+symbol4 i=join v=none line=4;
+symbol5 i=join v=none line=5;
+symbol6 i=join v=none line=6;
+plot a*x=1 j*x=2 k*x=3 l*x=4 m*x=5 n*x=6 /overlay;
+run;
+
+7
+
+data long2;
+set long;
+drop x;
+run;
+data long3;
+set long;
+drop y;
+run;
+proc transpose data=long2 out=wide1;
+var y;
+id time;
+by subject;
+run;
+data wide3;
+set wide1;
+drop _NAME_;
+rename _1=Y1 _2=y2 _3=Y3 _4=Y4;
+run;
+proc transpose data=long3 out=wide2;
+var x;
+id time;
+by subject;
+run;
+data wide5;
+set wide2;
+drop _NAME_;
+rename _1=X1 _2=X2 _3=X3 _4=X4;
+RUN;
+data wide6;
+merge wide3 wide5;
+run;
+data wide;
+set wide6;
+DX12=X2-X1;
+DX23=X3-X2;
+DX34=X4-X3;
+DY12=Y2-Y1;
+DY23=Y3-Y2;
+DY34=Y4-Y3;
+run;
+proc print;
+run;
+
+8
+
+proc sort data=sdd;
+by num;
+run;
+proc transpose data=sdd out=st;
+var Y1-Y18;
+by num;
+run;
+data s1;
+set st;
+rename _NAME_=tihao COL1=fen;
+proc print;
+run;
+
+data s2
+set s1;
+run;
+proc sort data=s2;
+by tihao;
+run;
+proc sort data=f;
+by tihao;
+run;
+data wtf;
+merge s2 f;
+by tihao;
+run;
+proc print;
+run;
+
+data wtf2;
+set wtf;
+keep num tihao fen; 
+run;
+proc print;
+run;
+proc sort data=wtf2;
+by num;
+run;
+proc transpose data=wtf2 out=wtf3;
+var fen;
+id tihao;
+by num;
+run;
+proc print data=wtf3;
+run;
+data wtf4;
+set wtf3;
+T1=Y1+Y2+Y3+Y4+Y5+Y6+Y7+Y8+Y9+Y10;
+T2=Y13;
+T3=Y11+Y12+Y14+Y15+Y16+Y17;
+T4=Y18;
+DROP Y1-Y18;
+run;
+
+
+
